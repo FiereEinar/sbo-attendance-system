@@ -18,7 +18,7 @@ const handleZodError = (res: Response, error: z.ZodError) => {
 
 	res.status(BAD_REQUEST).json({
 		errors,
-		error: error.issues[0].message,
+		error: error.issues[0]?.message,
 		message: error.message,
 	});
 };
