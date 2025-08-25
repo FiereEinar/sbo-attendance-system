@@ -1,11 +1,15 @@
-const getEnv = (key: string, defaultValue?: string): string => {
-	const value = process.env[key] || defaultValue;
+export const accessTokenCookieName = 'sbo_attendance_access_token';
+export const refreshTokenCookieName = 'sbo_attendance_refresh_token';
 
-	if (value === undefined) {
-		throw new Error(`Environment variable ${key} is required`);
-	}
-
-	return value;
+export const DB_MODEL = {
+	USER: 'User',
+	STUDENT: 'Student',
+	TRANSACTION: 'Transaction',
+	ORGANIZATION: 'Organization',
+	CATEGORY: 'Category',
+	SESSION: 'Session',
 };
 
-export const PORT = getEnv('PORT', '3000');
+export enum AppErrorCodes {
+	InvalidAccessToken = 'InvalidAccessToken',
+}
