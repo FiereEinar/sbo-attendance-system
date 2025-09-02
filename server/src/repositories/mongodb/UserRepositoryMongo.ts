@@ -19,4 +19,7 @@ export class UserRepositoryMongo implements IUserRepository {
 		const res = await UserModel.findByIdAndDelete(id);
 		return !!res;
 	}
+	async findByQuery(query: Partial<User>): Promise<User[]> {
+		return UserModel.find(query).lean();
+	}
 }

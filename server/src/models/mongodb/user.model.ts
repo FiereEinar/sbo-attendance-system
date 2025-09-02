@@ -11,5 +11,11 @@ const UserSchema = new Schema<User>({
 	id: { type: String, required: true },
 });
 
+UserSchema.methods.omitPassword = function () {
+	const user = this.toObject();
+	delete user.password;
+	return user;
+};
+
 const UserModel = mongoose.model('User', UserSchema);
 export default UserModel;

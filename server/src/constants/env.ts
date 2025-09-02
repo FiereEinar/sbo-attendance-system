@@ -12,3 +12,4 @@ export const PORT = getEnv('PORT', '8000');
 export const MONGO_URI = getEnv('MONGO_URI');
 export const JWT_REFRESH_SECRET_KEY = getEnv('JWT_REFRESH_SECRET_KEY');
 export const JWT_SECRET_KEY = getEnv('JWT_SECRET_KEY');
+export const BCRYPT_SALT = getEnv('BCRYPT_SALT');
