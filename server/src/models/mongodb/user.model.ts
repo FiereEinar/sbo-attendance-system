@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { User } from '../../repositories/user.repository';
+import { User } from '../../schemas/user.schema';
 
 const Schema = mongoose.Schema;
 
@@ -8,7 +8,6 @@ const UserSchema = new Schema<User>({
 	lastname: { type: String, minlength: 1, maxlength: 50, required: true },
 	email: { type: String, required: false, unique: true },
 	password: { type: String, required: true },
-	id: { type: String, required: true },
 });
 
 UserSchema.methods.omitPassword = function () {

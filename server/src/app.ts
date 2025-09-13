@@ -7,9 +7,9 @@ import { PORT } from './constants/env';
 import { notFoundHandler } from './middlewares/not-found';
 import { errorHandler } from './middlewares/error';
 import { healthcheck } from './middlewares/healthcheck';
-import { connectToDB } from './repositories';
 
 import authRouter from './routes/auth.route';
+import connectToMongoDB from './database/mongodb';
 
 const app = express();
 app.use(express.json());
@@ -25,6 +25,6 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 app.listen(PORT, async () => {
-	await connectToDB();
+	await connectToMongoDB();
 	console.log(`Server is running on http://localhost:${PORT}`);
 });

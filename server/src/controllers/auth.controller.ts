@@ -1,22 +1,18 @@
 import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
-import { createUser, findUsersByQuery } from '../services/user.service';
 import { createUserSchema, loginSchema } from '../schemas/user.schema';
 import appAssert from '../errors/app-assert';
 import { BAD_REQUEST } from '../constants/http';
 import { BCRYPT_SALT } from '../constants/env';
 import SessionModel from '../models/mongodb/session.model';
-
-// TODO: remove abstraction layer db, refactor .service files
+import UserModel from '../models/mongodb/user.model';
 
 /**
  * POST /api/v1/auth/login - Login
  */
 export const loginController = asyncHandler(async (req, res) => {
 	const body = loginSchema.parse(req.body);
-	const user = await findUsersByQuery({ email: body.email }).then(
-		(res) => res[0]
-	);
+	const user = await UserModel.findOne({ email: body.email });
 
 	// Check if user exists
 	appAssert(user, BAD_REQUEST, 'User not found');
@@ -56,7 +52,7 @@ export const signupController = asyncHandler(async (req, res) => {
 	);
 	body.password = hashedPassword;
 
-	const user = await createUser(body);
+	const user = await UserModel.create(body);
 
 	res.json({ message: 'Created User', user });
 });

@@ -2,29 +2,29 @@ import z from 'zod';
 
 const MIN_PASSWORD_LEN = 6;
 
-export const createUserSchema = z
-	.object({
-		id: z.string().min(1, 'ID is required'),
-		firstname: z.string().min(1, 'Firstname is required'),
-		lastname: z.string().min(1, 'Lastname is required'),
-		email: z.email('Invalid email'),
-		password: z
-			.string()
-			.min(
-				MIN_PASSWORD_LEN,
-				`Passwords must be atleast ${MIN_PASSWORD_LEN} characters`
-			),
-		confirmPassword: z
-			.string()
-			.min(
-				MIN_PASSWORD_LEN,
-				`Passwords must be atleast ${MIN_PASSWORD_LEN} characters`
-			),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: 'Passwords do not match',
-		path: ['confirmPassword'],
-	});
+export const UserSchema = z.object({
+	firstname: z.string().min(1, 'Firstname is required'),
+	lastname: z.string().min(1, 'Lastname is required'),
+	email: z.email('Invalid email'),
+	password: z
+		.string()
+		.min(
+			MIN_PASSWORD_LEN,
+			`Passwords must be atleast ${MIN_PASSWORD_LEN} characters`
+		),
+});
+
+export const createUserSchema = UserSchema.extend({
+	confirmPassword: z
+		.string()
+		.min(
+			MIN_PASSWORD_LEN,
+			`Passwords must be atleast ${MIN_PASSWORD_LEN} characters`
+		),
+}).refine((data) => data.password === data.confirmPassword, {
+	message: 'Passwords do not match',
+	path: ['confirmPassword'],
+});
 
 export const updateUserSchema = z.object({
 	firstname: z.string().min(1, 'Firstname is required'),
@@ -42,5 +42,6 @@ export const loginSchema = z.object({
 		),
 });
 
+export type User = z.infer<typeof UserSchema>;
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
