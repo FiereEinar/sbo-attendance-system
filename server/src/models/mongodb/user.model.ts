@@ -7,6 +7,7 @@ export interface IUser extends mongoose.Document {
 	lastname: string;
 	email: string;
 	password: string;
+	omitPassword: () => Omit<IUser, 'password'>;
 }
 
 const UserSchema = new Schema<IUser>({
