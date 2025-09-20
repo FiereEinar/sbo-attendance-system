@@ -28,11 +28,11 @@ export default function Route() {
 			errorElement: <NotFound />,
 			children: [
 				{
-					index: true,
+					path: '/admin/dashboard',
 					element: <Dashboard />,
 				},
 				{
-					path: '/attendance',
+					path: '/admin/attendance',
 					element: <Attendance />,
 				},
 				{
