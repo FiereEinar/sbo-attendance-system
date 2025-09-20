@@ -7,8 +7,13 @@ import {
 	Users,
 	BarChart3,
 	Settings,
+	SunMoon,
+	Moon,
+	Sun,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { useThemeStore } from '../store/theme';
+import LogoutButton from './buttons/LogoutButton';
 
 type SidebarItem = {
 	title: string;
@@ -60,39 +65,56 @@ export const adminSidebarItems: SidebarItem[] = [
 ];
 
 export default function Sidebar() {
+	const { theme, setTheme } = useThemeStore((state) => state);
+
+	const onThemeClick = () => {
+		setTheme(theme === 'dark' ? 'light' : 'dark');
+	};
+
 	return (
 		<aside className='p-5 border-r border-r-neutral-600 min-h-screen'>
-			<div className='flex flex-col justify-between gap-5'>
-				<div className='shrink-0 flex gap-2 items-center'>
-					<img
-						className='shrink-0 size-12 md:size-16 rounded-full border'
-						src='/images/SBO_LOGO.jpg'
-						alt=''
-					/>
-					<div className='hidden md:flex flex-col text-muted-foreground'>
-						<h4 className='text-3xl font-bold'>SEATS</h4>
-						<p className='text-xs'>Student Event Attendance</p>
-						<p className='text-xs'>Tracking System</p>
+			<div className='flex flex-col justify-between gap-10'>
+				<div className='flex flex-col gap-2 items-start'>
+					<div className='flex gap-2 items-center'>
+						<img
+							className='shrink-0 size-12 md:size-16 rounded-full border'
+							src='/images/SBO_LOGO.jpg'
+							alt=''
+						/>
+						<div className='hidden md:flex flex-col text-muted-foreground'>
+							<h4 className='text-3xl font-bold'>SEATS</h4>
+							<p className='text-xs'>Student Event Attendance</p>
+							<p className='text-xs'>Tracking System</p>
+						</div>
+					</div>
+
+					<div>
+						{adminSidebarItems.map((item) => (
+							<NavLink
+								key={item.title}
+								to={item.path}
+								className={({ isActive }) => {
+									return `transition-all flex items-center gap-2 p-3 pl-0 rounded-md ${
+										isActive ? 'text-blue-500' : 'hover:text-blue-500'
+									}`;
+								}}
+							>
+								<item.icon className='w-5 h-5' />
+								<span>{item.title}</span>
+							</NavLink>
+						))}
 					</div>
 				</div>
 
 				<div>
-					{adminSidebarItems.map((item) => (
-						<NavLink
-							key={item.title}
-							to={item.path}
-							className={({ isActive }) => {
-								return `transition-all flex items-center gap-2 p-3 pl-0 rounded-md ${
-									isActive
-										? 'text-blue-500'
-										: 'text-muted-foreground hover:text-blue-500'
-								}`;
-							}}
-						>
-							<item.icon className='w-5 h-5' />
-							<span>{item.title}</span>
-						</NavLink>
-					))}
+					<button
+						onClick={onThemeClick}
+						className='transition-all flex items-center gap-2 p-3 pl-0 rounded-md hover:text-blue-500'
+					>
+						{theme === 'dark' ? <Moon /> : <Sun />}
+						<span>Toggle Theme</span>
+					</button>
+					<LogoutButton />
 				</div>
 			</div>
 		</aside>

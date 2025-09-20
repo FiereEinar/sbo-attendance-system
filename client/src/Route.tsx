@@ -4,27 +4,23 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import NotFound from './pages/NotFount';
 import { MantineProvider } from '@mantine/core';
-import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import Attendance from './pages/Attendance';
 import UploadStudents from './pages/UploadStudents';
+import { useThemeStore } from './store/theme';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function Route() {
-	const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-
-	const onThemeClick = () => {
-		console.log('Clicked! theme is ', theme);
-		if (theme === 'light') {
-			setTheme('dark');
-		} else {
-			setTheme('light');
-		}
-	};
+	const theme = useThemeStore((state) => state.theme);
 
 	const route = createBrowserRouter([
 		{
 			path: '/',
-			element: <App />,
+			element: (
+				<ProtectedRoute>
+					<App />
+				</ProtectedRoute>
+			),
 			errorElement: <NotFound />,
 			children: [
 				{

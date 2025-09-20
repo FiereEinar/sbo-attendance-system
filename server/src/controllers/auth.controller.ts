@@ -95,7 +95,7 @@ export const signupController = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/v1/auth/logout - Logout
+ * GET /api/v1/auth/logout - Logout
  */
 export const logoutController = asyncHandler(async (req, res) => {
 	const accessToken = getAccessToken(req);
