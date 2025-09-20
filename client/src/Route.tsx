@@ -7,6 +7,7 @@ import { MantineProvider } from '@mantine/core';
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
 import Attendance from './pages/Attendance';
+import UploadStudents from './pages/UploadStudents';
 
 export default function Route() {
 	const [theme, setTheme] = useState<'light' | 'dark'>('dark');
@@ -33,6 +34,10 @@ export default function Route() {
 				{
 					path: '/attendance',
 					element: <Attendance />,
+				},
+				{
+					path: '/upload-students',
+					element: <UploadStudents />,
 				},
 			],
 		},

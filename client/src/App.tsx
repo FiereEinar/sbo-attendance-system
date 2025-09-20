@@ -1,9 +1,13 @@
 import '@mantine/core/styles.css';
 import { TextInput } from '@mantine/core';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
+import { setNavigate } from './lib/navigate';
 
 function App() {
+	const navigate = useNavigate();
+	setNavigate(navigate);
+
 	return (
 		<main className='flex items-start'>
 			<Sidebar />
