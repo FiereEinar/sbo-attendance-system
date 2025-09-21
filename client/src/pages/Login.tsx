@@ -1,11 +1,11 @@
-import { Button, Fieldset, Input, TextInput } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { useForm } from 'react-hook-form';
 import type z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../lib/validations/loginSchema';
 import InputField from '../components/InputField';
 import axiosInstance from '../api/axiosInstance';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
@@ -52,7 +52,12 @@ export default function Login() {
 				{errors.root && (
 					<p className='text-xs text-red-500'>{errors.root.message}</p>
 				)}
-				<div className='flex justify-end'>
+				<div className='flex justify-end gap-2'>
+					<Link to='/signup'>
+						<Button disabled={isSubmitting} type='button' variant='subtle'>
+							Signup
+						</Button>
+					</Link>
 					<Button disabled={isSubmitting} type='submit'>
 						Submit
 					</Button>

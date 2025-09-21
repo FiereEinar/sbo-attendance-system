@@ -2,7 +2,13 @@ import asyncHandler from 'express-async-handler';
 import bcrypt from 'bcryptjs';
 import { createUserSchema, loginSchema } from '../schemas/user.schema';
 import appAssert from '../errors/app-assert';
-import { BAD_REQUEST, NO_CONTENT, OK, UNAUTHORIZED } from '../constants/http';
+import {
+	BAD_REQUEST,
+	CONFLICT,
+	NO_CONTENT,
+	OK,
+	UNAUTHORIZED,
+} from '../constants/http';
 import { BCRYPT_SALT, JWT_REFRESH_SECRET_KEY } from '../constants/env';
 import SessionModel from '../models/mongodb/session.model';
 import UserModel from '../models/mongodb/user.model';
@@ -71,6 +77,10 @@ export const loginController = asyncHandler(async (req, res) => {
  */
 export const signupController = asyncHandler(async (req, res) => {
 	const body = createUserSchema.parse(req.body);
+
+	// check for duplicate email
+	const existingUser = await UserModel.find({ email: body.email });
+	appAssert(!existingUser, CONFLICT, 'Email already used');
 
 	// Check if passwords match
 	appAssert(

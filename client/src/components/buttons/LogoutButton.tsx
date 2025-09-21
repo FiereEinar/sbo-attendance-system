@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../api/axiosInstance';
-import { LogOut, LogOutIcon } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 export default function LogoutButton() {
 	const navigate = useNavigate();

@@ -7,7 +7,6 @@ import {
 	Users,
 	BarChart3,
 	Settings,
-	SunMoon,
 	Moon,
 	Sun,
 } from 'lucide-react';
