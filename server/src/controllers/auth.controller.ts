@@ -67,9 +67,7 @@ export const loginController = asyncHandler(async (req, res) => {
 	const refreshToken = signToken({ sessionID }, refreshTokenSignOptions);
 	setAuthCookie({ res, accessToken, refreshToken });
 
-	res.json(
-		new CustomResponse(true, { user: user.omitPassword() }, 'Login successful')
-	);
+	res.json(new CustomResponse(true, user.omitPassword(), 'Login successful'));
 });
 
 /**
@@ -79,7 +77,8 @@ export const signupController = asyncHandler(async (req, res) => {
 	const body = createUserSchema.parse(req.body);
 
 	// check for duplicate email
-	const existingUser = await UserModel.find({ email: body.email });
+	const existingUser = await UserModel.findOne({ email: body.email });
+	console.log(existingUser);
 	appAssert(!existingUser, CONFLICT, 'Email already used');
 
 	// Check if passwords match
@@ -99,9 +98,7 @@ export const signupController = asyncHandler(async (req, res) => {
 	// create user
 	const user = await UserModel.create(body);
 
-	res.json(
-		new CustomResponse(true, { user: user.omitPassword() }, 'Signup successful')
-	);
+	res.json(new CustomResponse(true, user.omitPassword(), 'Signup successful'));
 });
 
 /**

@@ -9,6 +9,11 @@ import Attendance from './pages/Attendance';
 import UploadStudents from './pages/UploadStudents';
 import { useThemeStore } from './store/theme';
 import ProtectedRoute from './components/ProtectedRoute';
+import { NotificationProvider } from './hooks/useNotification';
+import Events from './pages/Events';
+import Students from './pages/Students';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
 
 export default function Route() {
 	const theme = useThemeStore((state) => state.theme);
@@ -28,8 +33,24 @@ export default function Route() {
 					element: <Dashboard />,
 				},
 				{
+					path: '/admin/events',
+					element: <Events />,
+				},
+				{
 					path: '/admin/attendance',
 					element: <Attendance />,
+				},
+				{
+					path: '/admin/students',
+					element: <Students />,
+				},
+				{
+					path: '/admin/reports',
+					element: <Reports />,
+				},
+				{
+					path: '/admin/settings',
+					element: <Settings />,
 				},
 				{
 					path: '/upload-students',
@@ -49,8 +70,9 @@ export default function Route() {
 
 	return (
 		<MantineProvider forceColorScheme={theme}>
-			<RouterProvider router={route} />
-			{/* <Button onClick={onThemeClick}>Click Me!</Button> */}
+			<NotificationProvider>
+				<RouterProvider router={route} />
+			</NotificationProvider>
 		</MantineProvider>
 	);
 }

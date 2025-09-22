@@ -6,10 +6,15 @@ import { loginSchema } from '../lib/validations/loginSchema';
 import InputField from '../components/InputField';
 import axiosInstance from '../api/axiosInstance';
 import { Link, useNavigate } from 'react-router-dom';
+import Header from '../components/ui/header';
+import { useNotification } from '../hooks/useNotification';
+import type { User } from '../types/user';
+import type { APIResponse } from '../types/api-response';
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
+	const notification = useNotification();
 	const navigate = useNavigate();
 	const {
 		register,
@@ -22,10 +27,18 @@ export default function Login() {
 
 	const onSubmit = async (formData: LoginFormValues) => {
 		try {
-			const { data } = await axiosInstance.post('/auth/login', formData);
-			console.log(data.data.user);
+			const { data } = await axiosInstance.post<APIResponse<User>>(
+				'/auth/login',
+				formData
+			);
+			console.log(data);
+			notification({
+				title: `Hello there, ${data.data.firstname}!`,
+				message: '',
+			});
 			navigate('/admin/dashboard');
 		} catch (error) {
+			console.log(error);
 			setError('root', { message: 'Invalid email or password' });
 		}
 	};
@@ -33,6 +46,7 @@ export default function Login() {
 	return (
 		<div className='min-h-screen flex items-center justify-center'>
 			<form onSubmit={handleSubmit(onSubmit)} className='space-y-2 w-[400px]'>
+				<Header>Login</Header>
 				<InputField<LoginFormValues>
 					name='email'
 					id='email'
@@ -52,12 +66,14 @@ export default function Login() {
 				{errors.root && (
 					<p className='text-xs text-red-500'>{errors.root.message}</p>
 				)}
-				<div className='flex justify-end gap-2'>
-					<Link to='/signup'>
-						<Button disabled={isSubmitting} type='button' variant='subtle'>
-							Signup
-						</Button>
+				<p className='text-xs'>
+					Don&apos;t have an account?
+					<Link to='/signup' className='text-blue-500'>
+						{' '}
+						Signup
 					</Link>
+				</p>
+				<div className='flex justify-end gap-2'>
 					<Button disabled={isSubmitting} type='submit'>
 						Submit
 					</Button>
