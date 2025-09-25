@@ -4,15 +4,17 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 dotenv.config();
 
-import { PORT } from './constants/env';
+import connectToMongoDB from './database/mongodb';
 import { notFoundHandler } from './middlewares/not-found';
 import { errorHandler } from './middlewares/error';
 import { healthcheck } from './middlewares/healthcheck';
+import { corsOptions } from './utils/cors';
+import { PORT } from './constants/env';
 
 import authRouter from './routes/auth.route';
 import studentRouter from './routes/student.route';
-import connectToMongoDB from './database/mongodb';
-import { corsOptions } from './utils/cors';
+import eventRouter from './routes/event.route';
+import { auth } from './middlewares/auth';
 
 const app = express();
 app.use(cors(corsOptions));
@@ -23,7 +25,9 @@ app.get('/', healthcheck);
 
 // Routes
 app.use('/api/v1/auth', authRouter);
+app.use(auth);
 app.use('/api/v1/student', studentRouter);
+app.use('/api/v1/event', eventRouter);
 
 // Error handlers
 app.use(notFoundHandler);

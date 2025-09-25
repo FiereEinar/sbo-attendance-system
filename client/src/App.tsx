@@ -10,11 +10,9 @@ function App() {
 	return (
 		<main className='flex items-start min-h-screen '>
 			<Sidebar />
+
 			<section className='bg-[#0A0A0A] p-5 w-full min-h-screen'>
-				<h1 className='text-blue-500'>Hello World!</h1>
-				<div>
-					<Outlet />
-				</div>
+				<Outlet />
 			</section>
 		</main>
 	);

@@ -4,7 +4,10 @@ import { BAD_REQUEST } from '../constants/http';
 import CustomResponse from '../models/utils/response';
 import { serverlessCSVLoader } from '../utils/csv';
 
-export const importStudentController = asyncHandler(async (req, res) => {
+/**
+ * @route POST /api/v1/students/file/import
+ */
+export const importStudentHandler = asyncHandler(async (req, res) => {
 	const file = req.file;
 	appAssert(file, BAD_REQUEST, 'Server did not recieve any file');
 

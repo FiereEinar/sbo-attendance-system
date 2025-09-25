@@ -1,17 +1,17 @@
 import express from 'express';
 import {
-	loginController,
-	logoutController,
-	refreshTokenController,
-	signupController,
-	verifyAuthController,
+	loginHandler,
+	logoutHandler,
+	refreshTokenHandler,
+	signupHandler,
+	verifyAuthHandler,
 } from '../controllers/auth.controller';
 const router = express.Router();
 
-router.post('/login', loginController);
-router.post('/signup', signupController);
-router.post('/token/verify', verifyAuthController);
-router.get('/logout', logoutController);
-router.get('/refresh', refreshTokenController);
+router.post('/login', loginHandler);
+router.post('/signup', signupHandler);
+router.post('/token/verify', verifyAuthHandler);
+router.get('/logout', logoutHandler);
+router.get('/refresh', refreshTokenHandler);
 
 export default router;

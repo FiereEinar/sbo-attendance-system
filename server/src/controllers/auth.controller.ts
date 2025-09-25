@@ -36,9 +36,9 @@ import {
 } from '../constants';
 
 /**
- * POST /api/v1/auth/login - Login
+ * @route POST /api/v1/auth/login - Login
  */
-export const loginController = asyncHandler(async (req, res) => {
+export const loginHandler = asyncHandler(async (req, res) => {
 	const body = loginSchema.parse(req.body);
 	const user = await UserModel.findOne({ email: body.email }).exec();
 
@@ -71,9 +71,9 @@ export const loginController = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/v1/auth/signup - Sign up
+ * @route POST /api/v1/auth/signup - Sign up
  */
-export const signupController = asyncHandler(async (req, res) => {
+export const signupHandler = asyncHandler(async (req, res) => {
 	const body = createUserSchema.parse(req.body);
 
 	// check for duplicate email
@@ -102,9 +102,9 @@ export const signupController = asyncHandler(async (req, res) => {
 });
 
 /**
- * GET /api/v1/auth/logout - Logout
+ * @route GET /api/v1/auth/logout - Logout
  */
-export const logoutController = asyncHandler(async (req, res) => {
+export const logoutHandler = asyncHandler(async (req, res) => {
 	const accessToken = getAccessToken(req);
 
 	// check if token is present
@@ -127,9 +127,9 @@ export const logoutController = asyncHandler(async (req, res) => {
 });
 
 /**
- * POST /api/v1/auth/refresh - Refresh token
+ * @route GET /api/v1/auth/refresh - Refresh token
  */
-export const refreshTokenController = asyncHandler(async (req, res) => {
+export const refreshTokenHandler = asyncHandler(async (req, res) => {
 	// get the refresh token
 	const refreshToken = req.cookies[refreshTokenCookieName] as string;
 	appAssert(refreshToken, UNAUTHORIZED, 'No refresh token found');
@@ -184,7 +184,10 @@ export const refreshTokenController = asyncHandler(async (req, res) => {
 		.json(new CustomResponse(true, null, 'Token refreshed'));
 });
 
-export const verifyAuthController = asyncHandler(async (req, res) => {
+/**
+ * @route POST /api/v1/token/verify
+ */
+export const verifyAuthHandler = asyncHandler(async (req, res) => {
 	const token = getAccessToken(req);
 	appAssert(
 		token,

@@ -3,7 +3,7 @@ import InputField from '../components/InputField';
 import { signupSchema } from '../lib/validations/signupSchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
-import { Button, Notification } from '@mantine/core';
+import { Button } from '@mantine/core';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
 import Header from '../components/ui/header';
@@ -26,7 +26,7 @@ export default function Signup() {
 
 	const onSubmit = async (formData: SignupFormValues) => {
 		try {
-			const { data } = await axiosInstance.post('/auth/signup', formData);
+			await axiosInstance.post('/auth/signup', formData);
 
 			notification({
 				title: 'Signed up successfully',
@@ -36,10 +36,6 @@ export default function Signup() {
 		} catch (error: any) {
 			setError('root', { message: error.message });
 		}
-	};
-
-	const onClose = () => {
-		console.log('closed');
 	};
 
 	return (
