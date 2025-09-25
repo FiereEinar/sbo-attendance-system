@@ -32,10 +32,10 @@ export default function CreateEventForm() {
 	const onSubmit = async (formData: EventFormValues) => {
 		try {
 			const body = { ...formData, startTime, endTime };
-			const { data } = await axiosInstance.post('/event', body);
+			await axiosInstance.post('/event', body);
 
 			notification({
-				title: 'Event create successfully!',
+				title: 'Event created successfully!',
 				message: '',
 			});
 			await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EVENTS] });

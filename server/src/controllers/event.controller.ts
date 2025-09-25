@@ -17,7 +17,6 @@ export const getEventsHandler = asyncHandler(async (req, res) => {
  * @route POST /api/v1/event
  */
 export const createEventHandler = asyncHandler(async (req, res) => {
-	console.log(req.body);
 	const body = createEventSchema.parse(req.body);
 
 	const event = await EventModel.create({ ...body, createdBy: req.user._id });
