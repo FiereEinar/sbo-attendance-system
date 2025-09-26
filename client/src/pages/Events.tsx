@@ -4,13 +4,15 @@ import CreateEventModal from '../modals/CreateEventModal';
 import { useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS } from '../constants';
 import { fetchEvents } from '../api/event';
-import dayjs from 'dayjs';
 import axiosInstance from '../api/axiosInstance';
 import { useNotification } from '../hooks/useNotification';
 import { queryClient } from '../main';
+import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
 export default function Events() {
 	const notification = useNotification();
+	const navigate = useNavigate();
 	const { data } = useQuery({
 		queryFn: fetchEvents,
 		queryKey: [QUERY_KEYS.EVENTS],
@@ -54,16 +56,24 @@ export default function Events() {
 						</Table.Thead>
 						<Table.Tbody>
 							{data?.map((event) => (
-								<Table.Tr key={event._id}>
-									<Table.Td>{event.title}</Table.Td>
+								<Table.Tr className='' key={event._id}>
+									<Table.Td
+										onClick={() => navigate(`/admin/events/${event._id}`)}
+										className='transition-all cursor-pointer hover:text-blue-500'
+									>
+										{event.title}
+									</Table.Td>
 									<Table.Td>{event.description}</Table.Td>
 									<Table.Td>
-										{dayjs(event.startTime).format('YY-MM-DD HH:mm')}
+										{format(
+											new Date(event.startTime),
+											'MMM dd, yyyy hh:mm aaa'
+										)}
 									</Table.Td>
 									<Table.Td>
-										{dayjs(event.endTime).format('YY-MM-DD HH:mm')}
+										{format(new Date(event.endTime), 'MMM dd, yyyy hh:mm aaa')}
 									</Table.Td>
-									<Table.Td className='space-x-2'>
+									<Table.Td className='flex gap-2 items-center justify-center'>
 										<Button
 											variant='subtle'
 											onClick={() => console.log('Hello')}

@@ -11,3 +11,14 @@ export const fetchEvents = async (): Promise<Event[]> => {
 		throw error;
 	}
 };
+
+export const fetchSingleQuery = async (eventID: string): Promise<Event> => {
+	try {
+		const { data } = await axiosInstance.get(`/event/${eventID}`);
+
+		return data.data;
+	} catch (error) {
+		console.error('Failed to fetch single event', error);
+		throw error;
+	}
+};

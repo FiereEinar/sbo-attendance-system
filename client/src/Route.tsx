@@ -14,6 +14,7 @@ import Events from './pages/Events';
 import Students from './pages/Students';
 import Reports from './pages/Reports';
 import Settings from './pages/Settings';
+import SingleEvent from './pages/SingleEvent';
 
 export default function Route() {
 	const theme = useThemeStore((state) => state.theme);
@@ -35,6 +36,10 @@ export default function Route() {
 				{
 					path: '/admin/events',
 					element: <Events />,
+				},
+				{
+					path: '/admin/events/:eventID',
+					element: <SingleEvent />,
 				},
 				{
 					path: '/admin/attendance',

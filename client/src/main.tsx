@@ -5,8 +5,12 @@ import Route from './Route.tsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 export const queryClient = new QueryClient();
+const rootElement = document.getElementById('root') as HTMLElement;
 
-createRoot(document.getElementById('root')!).render(
+let root = (rootElement as any)._reactRoot ?? createRoot(rootElement);
+(rootElement as any)._reactRoot = root;
+
+root.render(
 	<StrictMode>
 		<QueryClientProvider client={queryClient}>
 			<Route />

@@ -17,13 +17,14 @@ type EventFormValues = z.infer<typeof createEventSchema>;
 
 export default function CreateEventForm() {
 	const notification = useNotification();
-	const [startTime, setStartTime] = useState(dayjs().format('YYYY-MM-DD'));
+	const [startTime, setStartTime] = useState(new Date().toISOString());
 	const [endTime, setEndTime] = useState('');
 
 	const {
 		handleSubmit,
 		register,
 		setError,
+		reset,
 		formState: { errors, isSubmitting },
 	} = useForm({
 		resolver: zodResolver(createEventSchema),
@@ -39,6 +40,8 @@ export default function CreateEventForm() {
 				message: '',
 			});
 			await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EVENTS] });
+			reset();
+			setEndTime('');
 		} catch (error: any) {
 			console.error('Failed to create event', error);
 			setError('root', error.message);
@@ -64,7 +67,7 @@ export default function CreateEventForm() {
 			<DateTimePicker
 				clearable
 				value={startTime}
-				onChange={(value) => setStartTime(dayjs(value).format('YYYY-MM-DD'))}
+				onChange={(value) => setStartTime(new Date(value ?? '').toISOString())}
 				label='Start time:'
 				placeholder='Pick date and time'
 				timePickerProps={
@@ -76,7 +79,7 @@ export default function CreateEventForm() {
 			<DateTimePicker
 				clearable
 				value={endTime}
-				onChange={(value) => setEndTime(dayjs(value).format('YYYY-MM-DD'))}
+				onChange={(value) => setEndTime(new Date(value ?? '').toISOString())}
 				label='End time'
 				placeholder='Pick date and time'
 				timePickerProps={

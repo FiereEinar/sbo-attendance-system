@@ -3,7 +3,7 @@ import { createEventSchema } from '../schemas/event.schema';
 import EventModel from '../models/mongodb/event.model';
 import CustomResponse from '../models/utils/response';
 import appAssert from '../errors/app-assert';
-import { BAD_REQUEST, NO_CONTENT } from '../constants/http';
+import { BAD_REQUEST, NO_CONTENT, NOT_FOUND } from '../constants/http';
 
 /**
  * @route GET /api/v1/event
@@ -11,6 +11,17 @@ import { BAD_REQUEST, NO_CONTENT } from '../constants/http';
 export const getEventsHandler = asyncHandler(async (req, res) => {
 	const events = await EventModel.find();
 	res.json(new CustomResponse(true, events, 'Events fetched successfully'));
+});
+
+/**
+ * @route GET /api/v1/event/:eventID
+ */
+export const getSingleEvent = asyncHandler(async (req, res) => {
+	const { eventID } = req.params;
+	const event = await EventModel.findById(eventID);
+	appAssert(event, NOT_FOUND, 'Event not found');
+
+	res.json(new CustomResponse(true, event, 'Event found'));
 });
 
 /**
