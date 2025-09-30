@@ -1,10 +1,12 @@
-import { useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/ui/header';
 import { useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS } from '../constants';
 import { fetchSingleQuery } from '../api/event';
+import { ChevronLeft } from 'lucide-react';
 
 export default function SingleEvent() {
+	const navigate = useNavigate();
 	const { eventID } = useParams();
 	const { data: event } = useQuery({
 		queryKey: [QUERY_KEYS.EVENTS, eventID],
@@ -13,8 +15,14 @@ export default function SingleEvent() {
 
 	return (
 		<div className='flex flex-col gap-10'>
-			<div className='w-full flex flex-col items-start justify-between'>
-				<Header>{event?.title}</Header>
+			<div className='w-full flex flex-col items-start justify-between gap-2'>
+				<button
+					onClick={() => navigate(-1)}
+					className='flex items-center gap-2'
+				>
+					<ChevronLeft />
+					<Header>{event?.title}</Header>
+				</button>
 				<p>{event?.description}</p>
 			</div>
 		</div>

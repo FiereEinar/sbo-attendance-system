@@ -32,7 +32,11 @@ export default function CreateEventForm() {
 
 	const onSubmit = async (formData: EventFormValues) => {
 		try {
-			const body = { ...formData, startTime, endTime };
+			const body = {
+				...formData,
+				startTime: new Date(startTime),
+				endTime: new Date(endTime),
+			};
 			await axiosInstance.post('/event', body);
 
 			notification({
