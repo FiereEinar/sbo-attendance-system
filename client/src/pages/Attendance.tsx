@@ -1,12 +1,20 @@
 import { Button, Table } from '@mantine/core';
 import Header from '../components/ui/header';
-import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 export default function Attendance() {
 	return (
 		<div className='flex flex-col gap-10'>
 			<div className='w-full flex items-center justify-between'>
-				<Header>Attendance</Header>
+				<div>
+					<Header>Attendance</Header>
+					<p>Recently recorded attendance</p>
+				</div>
+				<div>
+					<Link to='/admin/attendance/record'>
+						<Button>Record Attendance</Button>
+					</Link>
+				</div>
 			</div>
 			<div>
 				<Table.ScrollContainer minWidth={500} maxHeight={300}>

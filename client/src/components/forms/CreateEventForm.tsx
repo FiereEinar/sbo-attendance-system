@@ -37,6 +37,7 @@ export default function CreateEventForm() {
 				startTime: new Date(startTime),
 				endTime: new Date(endTime),
 			};
+
 			await axiosInstance.post('/event', body);
 
 			notification({
@@ -65,6 +66,20 @@ export default function CreateEventForm() {
 				name='description'
 				id='description'
 				label='Event Description:'
+				registerFn={register}
+				errors={errors}
+			/>
+			<InputField<EventFormValues>
+				name='type'
+				id='type'
+				label='Event Type:'
+				registerFn={register}
+				errors={errors}
+			/>
+			<InputField<EventFormValues>
+				name='venue'
+				id='venue'
+				label='Event Venue:'
 				registerFn={register}
 				errors={errors}
 			/>

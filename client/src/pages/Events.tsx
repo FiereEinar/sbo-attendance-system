@@ -48,7 +48,8 @@ export default function Events() {
 						<Table.Thead>
 							<Table.Tr>
 								<Table.Th>Event Title</Table.Th>
-								<Table.Th>Event Description</Table.Th>
+								<Table.Th>Event Type</Table.Th>
+								<Table.Th>Event Venue</Table.Th>
 								<Table.Th>Start Time</Table.Th>
 								<Table.Th>End Time</Table.Th>
 								<Table.Th>Actions</Table.Th>
@@ -63,7 +64,8 @@ export default function Events() {
 									>
 										{event.title}
 									</Table.Td>
-									<Table.Td>{event.description}</Table.Td>
+									<Table.Td>{event.type}</Table.Td>
+									<Table.Td>{event.venue}</Table.Td>
 									<Table.Td>
 										{format(
 											new Date(event.startTime),
