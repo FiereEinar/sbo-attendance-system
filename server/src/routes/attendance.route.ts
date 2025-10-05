@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+	downloadEventAttendanceCSVHandler,
 	getAttendanceHandler,
 	getEventAttendanceHandler,
 	getSingleAttendanceHandler,
@@ -14,5 +15,6 @@ router.get('/event/:eventID', getEventAttendanceHandler);
 router.get('/:attendanceID', getSingleAttendanceHandler);
 router.post('/record/time-in/event/:eventID', recordTimeInAttendanceHandler);
 router.post('/record/time-out/event/:eventID', recordTimeOutAttendanceHandler);
+router.get('/event/:eventID/download/csv', downloadEventAttendanceCSVHandler);
 
 export default router;

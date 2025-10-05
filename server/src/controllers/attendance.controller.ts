@@ -5,6 +5,7 @@ import StudentModel from '../models/mongodb/student.model';
 import appAssert from '../errors/app-assert';
 import { BAD_REQUEST, NOT_FOUND } from '../constants/http';
 import EventModel from '../models/mongodb/event.model';
+import { format, isWithinInterval } from 'date-fns';
 
 /**
  * @route GET /api/v1/attendance - get recently recorded attendances
@@ -31,7 +32,9 @@ export const getEventAttendanceHandler = asyncHandler(async (req, res) => {
 	const attendances = await AttendanceModel.find({ event: eventID })
 		.limit(parseInt(limit?.toString() ?? '10'))
 		.populate('student')
-		.populate('event');
+		.populate('event')
+		.sort({ createdAt: -1 })
+		.exec();
 
 	res.json(
 		new CustomResponse(true, attendances, 'Attendances fetched successfully')
@@ -140,3 +143,43 @@ export const recordTimeOutAttendanceHandler = asyncHandler(async (req, res) => {
 		new CustomResponse(true, attendance, 'Attendance recorded successfully')
 	);
 });
+
+/**
+ * @route GET /api/v1/attendance/event/:eventID/download/csv
+ */
+export const downloadEventAttendanceCSVHandler = asyncHandler(
+	async (req, res) => {
+		const { eventID } = req.params;
+
+		const event = await EventModel.findById(eventID);
+		appAssert(event, NOT_FOUND, 'Event not found');
+
+		const attendances = await AttendanceModel.find({ event: eventID })
+			.populate('student')
+			.populate('event');
+
+		const csv = [
+			'No.,Student ID,Full Name,Course/Year,Event Name,Date,Time In,Time Out,Remarks',
+			...attendances.map((attendance, i) => {
+				const fullname = `${attendance.student.firstname} ${attendance.student.middlename} ${attendance.student.lastname}`;
+				const eventDate = format(new Date(event.startTime), 'MM/dd/yyyy');
+				const timeIn = format(new Date(attendance.timeIn), 'hh:mm aaa');
+				const timeOut = format(new Date(attendance.timeOut), 'hh:mm aaa');
+				const isWithin = isWithinInterval(new Date(event.startTime), {
+					start: new Date(attendance.timeIn),
+					end: new Date(attendance.timeOut),
+				});
+				const remarks = isWithin ? 'Present' : 'Absent';
+
+				return `${i},${attendance.studentID},${fullname},${attendance.student.course}/${attendance.student.year},${event.title},${eventDate},${timeIn},${timeOut},${remarks}`;
+			}),
+		];
+
+		res.set({
+			'Content-Type': 'text/csv',
+			'Content-Disposition': `inline; filename=${event.title}-attendances.csv`,
+		});
+
+		res.send(csv.join('\n'));
+	}
+);

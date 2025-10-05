@@ -37,7 +37,7 @@ export default function Events() {
 	};
 
 	return (
-		<div className='flex flex-col gap-10'>
+		<div className='flex flex-col gap-10 bg-[#242424] p-5 rounded-xl'>
 			<div className='w-full flex items-center justify-between'>
 				<Header>Events</Header>
 				<CreateEventModal />

@@ -1,28 +1,38 @@
 import mongoose from 'mongoose';
+import { IStudent } from './student.model';
+import { IUser } from './user.model';
+import { IEvent } from './event.model';
 
 const Schema = mongoose.Schema;
 
 export type IAttendance = {
-	event: mongoose.Types.ObjectId;
-	recordedBy: mongoose.Types.ObjectId;
-	student: mongoose.Types.ObjectId;
+	event: IEvent;
+	recordedBy: IUser;
+	student: IStudent;
 	studentID: string;
 	timeIn: Date;
 	timeOut: Date;
+	createdAt: Date;
+	updatedAt: Date;
 };
 
-const AttendanceSchema = new Schema<IAttendance>({
-	event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
-	recordedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-	student: {
-		type: Schema.Types.ObjectId,
-		ref: 'Student',
-		required: true,
+const AttendanceSchema = new Schema<IAttendance>(
+	{
+		event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
+		recordedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+		student: {
+			type: Schema.Types.ObjectId,
+			ref: 'Student',
+			required: true,
+		},
+		studentID: { type: String, required: true },
+		timeIn: { type: Date },
+		timeOut: { type: Date },
 	},
-	studentID: { type: String, required: true },
-	timeIn: { type: Date },
-	timeOut: { type: Date },
-});
+	{
+		timestamps: true,
+	}
+);
 
 const AttendanceModel = mongoose.model<IAttendance>(
 	'Attendance',
