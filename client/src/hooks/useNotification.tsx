@@ -4,8 +4,10 @@ import { Notification } from '@mantine/core';
 
 type NotificationData = {
 	title: string;
-	message: string;
+	message?: string;
 	duration?: number; // default 5000 ms
+	icon?: React.ReactNode;
+	color?: string;
 };
 
 type NotificationContextType = {
@@ -32,13 +34,26 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 			{children}
 			{notification && (
 				<div className='absolute bottom-3 left-3 z-50'>
-					<Notification
-						title={notification.title}
-						onClose={handleClose}
-						withCloseButton
-					>
-						{notification.message}
-					</Notification>
+					{notification.icon ? (
+						<Notification
+							title={notification.title}
+							onClose={handleClose}
+							icon={notification.icon}
+							color={notification.color}
+							withCloseButton
+						>
+							{notification.message}
+						</Notification>
+					) : (
+						<Notification
+							title={notification.title}
+							onClose={handleClose}
+							color={notification.color}
+							withCloseButton
+						>
+							{notification.message}
+						</Notification>
+					)}
 				</div>
 			)}
 		</NotificationContext.Provider>

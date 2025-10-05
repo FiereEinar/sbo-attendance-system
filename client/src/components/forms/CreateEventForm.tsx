@@ -4,7 +4,6 @@ import { createEventSchema } from '../../lib/validations/eventSchema';
 import type z from 'zod';
 import InputField from '../InputField';
 import { DateTimePicker } from '@mantine/dates';
-import dayjs from 'dayjs';
 import '@mantine/dates/styles.css';
 import { Button } from '@mantine/core';
 import { useState } from 'react';

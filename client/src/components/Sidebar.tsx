@@ -1,7 +1,6 @@
 import {
 	LayoutDashboard,
 	CalendarDays,
-	ClipboardList,
 	GraduationCap,
 	BarChart3,
 	Settings,
@@ -31,11 +30,11 @@ export const adminSidebarItems: SidebarItem[] = [
 		path: '/admin/events',
 		icon: CalendarDays,
 	},
-	{
-		title: 'Attendance',
-		path: '/admin/attendance',
-		icon: ClipboardList,
-	},
+	// {
+	// 	title: 'Attendance',
+	// 	path: '/admin/attendance',
+	// 	icon: ClipboardList,
+	// },
 	{
 		title: 'Students',
 		path: '/admin/students',

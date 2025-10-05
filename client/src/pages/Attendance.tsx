@@ -1,6 +1,5 @@
-import { Button, Table } from '@mantine/core';
+import { Table } from '@mantine/core';
 import Header from '../components/ui/header';
-import { Link } from 'react-router-dom';
 
 export default function Attendance() {
 	return (
@@ -9,11 +8,6 @@ export default function Attendance() {
 				<div>
 					<Header>Attendance</Header>
 					<p>Recently recorded attendance</p>
-				</div>
-				<div>
-					<Link to='/admin/attendance/record'>
-						<Button>Record Attendance</Button>
-					</Link>
 				</div>
 			</div>
 			<div>

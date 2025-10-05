@@ -14,6 +14,7 @@ import { PORT } from './constants/env';
 import authRouter from './routes/auth.route';
 import studentRouter from './routes/student.route';
 import eventRouter from './routes/event.route';
+import attendanceRouter from './routes/attendance.route';
 import { auth } from './middlewares/auth';
 
 const app = express();
@@ -28,6 +29,7 @@ app.use('/api/v1/auth', authRouter);
 app.use(auth);
 app.use('/api/v1/student', studentRouter);
 app.use('/api/v1/event', eventRouter);
+app.use('/api/v1/attendance', attendanceRouter);
 
 // Error handlers
 app.use(notFoundHandler);

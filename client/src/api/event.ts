@@ -1,4 +1,4 @@
-import type { Event } from '../types/events';
+import type { Event } from '../types/event';
 import axiosInstance from './axiosInstance';
 
 export const fetchEvents = async (): Promise<Event[]> => {
@@ -12,7 +12,7 @@ export const fetchEvents = async (): Promise<Event[]> => {
 	}
 };
 
-export const fetchSingleQuery = async (eventID: string): Promise<Event> => {
+export const fetchSingleEvent = async (eventID: string): Promise<Event> => {
 	try {
 		const { data } = await axiosInstance.get(`/event/${eventID}`);
 

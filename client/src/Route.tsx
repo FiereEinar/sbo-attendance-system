@@ -30,6 +30,10 @@ export default function Route() {
 			errorElement: <NotFound />,
 			children: [
 				{
+					index: true,
+					element: <Dashboard />,
+				},
+				{
 					path: '/admin/dashboard',
 					element: <Dashboard />,
 				},

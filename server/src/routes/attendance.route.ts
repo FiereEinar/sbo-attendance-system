@@ -1,5 +1,18 @@
 import express from 'express';
+import {
+	getAttendanceHandler,
+	getEventAttendanceHandler,
+	getSingleAttendanceHandler,
+	recordTimeInAttendanceHandler,
+	recordTimeOutAttendanceHandler,
+} from '../controllers/attendance.controller';
 
-const route = express.Router();
+const router = express.Router();
 
-export default route;
+router.get('/', getAttendanceHandler);
+router.get('/event/:eventID', getEventAttendanceHandler);
+router.get('/:attendanceID', getSingleAttendanceHandler);
+router.post('/record/time-in/event/:eventID', recordTimeInAttendanceHandler);
+router.post('/record/time-out/event/:eventID', recordTimeOutAttendanceHandler);
+
+export default router;

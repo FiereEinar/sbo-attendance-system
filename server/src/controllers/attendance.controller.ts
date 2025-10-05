@@ -3,16 +3,18 @@ import AttendanceModel from '../models/mongodb/attendance.model';
 import CustomResponse from '../models/utils/response';
 import StudentModel from '../models/mongodb/student.model';
 import appAssert from '../errors/app-assert';
-import { NOT_FOUND } from '../constants/http';
+import { BAD_REQUEST, NOT_FOUND } from '../constants/http';
 import EventModel from '../models/mongodb/event.model';
 
 /**
  * @route GET /api/v1/attendance - get recently recorded attendances
  */
 export const getAttendanceHandler = asyncHandler(async (req, res) => {
-	const { limit } = req.body;
+	const { limit } = req.query;
 
-	const attendances = await AttendanceModel.find().limit(limit ?? 10);
+	const attendances = await AttendanceModel.find().limit(
+		parseInt(limit?.toString() ?? '10')
+	);
 
 	res.json(
 		new CustomResponse(true, attendances, 'Attendances fetched successfully')
@@ -20,12 +22,16 @@ export const getAttendanceHandler = asyncHandler(async (req, res) => {
 });
 
 /**
- * @route GET /api/v1/event/:eventID/attendance - Get recently recorded attendances of an event
+ * @route GET /api/v1/attendance/event/:eventID - Get recently recorded attendances of an event
  */
 export const getEventAttendanceHandler = asyncHandler(async (req, res) => {
 	const { eventID } = req.params;
+	const { limit } = req.query;
 
-	const attendances = await AttendanceModel.find({ eventID });
+	const attendances = await AttendanceModel.find({ event: eventID })
+		.limit(parseInt(limit?.toString() ?? '10'))
+		.populate('student')
+		.populate('event');
 
 	res.json(
 		new CustomResponse(true, attendances, 'Attendances fetched successfully')
@@ -33,7 +39,7 @@ export const getEventAttendanceHandler = asyncHandler(async (req, res) => {
 });
 
 /**
- * @route GET /api/v1/event/:eventID/attendance/:attendanceID - Get single attendance of an event
+ * @route GET /api/v1/attendance/:attendanceID - Get single attendance of an event
  */
 export const getSingleAttendanceHandler = asyncHandler(async (req, res) => {
 	const { attendanceID } = req.params;
@@ -46,7 +52,7 @@ export const getSingleAttendanceHandler = asyncHandler(async (req, res) => {
 });
 
 /**
- * @route POST /api/v1/event/:eventID/attendance - Record attendance (time in)
+ * @route POST /api/v1/attendance/record/time-in/event/:eventID - Record attendance (time in)
  */
 export const recordTimeInAttendanceHandler = asyncHandler(async (req, res) => {
 	const { eventID } = req.params;
@@ -60,10 +66,22 @@ export const recordTimeInAttendanceHandler = asyncHandler(async (req, res) => {
 	const event = await EventModel.findById(eventID);
 	appAssert(event, NOT_FOUND, 'Event not found');
 
-	const attendance = await AttendanceModel.create({
-		eventID,
+	// Check if student has already checked in
+	const existingAttendance = await AttendanceModel.findOne({
+		event: eventID,
 		studentID,
-		userID: req.user._id,
+	});
+	appAssert(
+		!existingAttendance?.timeIn,
+		BAD_REQUEST,
+		'Student has already checked in'
+	);
+
+	const attendance = await AttendanceModel.create({
+		event: eventID,
+		studentID,
+		recordedBy: req.user._id,
+		student: student._id,
 		timeIn: new Date(),
 		timeOut: null,
 	});
@@ -74,7 +92,7 @@ export const recordTimeInAttendanceHandler = asyncHandler(async (req, res) => {
 });
 
 /**
- * @route POST /api/v1/event/:eventID/attendance - Record attendance (time out)
+ * @route POST /api/v1/attendance/record/time-out/event/:eventID - Record attendance (time out)
  */
 export const recordTimeOutAttendanceHandler = asyncHandler(async (req, res) => {
 	const { eventID } = req.params;
@@ -89,16 +107,17 @@ export const recordTimeOutAttendanceHandler = asyncHandler(async (req, res) => {
 	appAssert(event, NOT_FOUND, 'Event not found');
 
 	const attendance = await AttendanceModel.findOne({
-		eventID,
+		event: eventID,
 		studentID,
 	});
 
 	// If the student has not checked in, create a new record, but only time out
 	if (!attendance) {
 		const newAttendance = await AttendanceModel.create({
-			eventID,
+			event: eventID,
 			studentID,
-			userID: req.user._id,
+			recordedBy: req.user._id,
+			student: student._id,
 			timeIn: null,
 			timeOut: new Date(),
 		});

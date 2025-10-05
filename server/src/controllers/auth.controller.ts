@@ -43,11 +43,11 @@ export const loginHandler = asyncHandler(async (req, res) => {
 	const user = await UserModel.findOne({ email: body.email }).exec();
 
 	// Check if user exists
-	appAssert(user, BAD_REQUEST, 'Incorrect email or password');
+	appAssert(user, UNAUTHORIZED, 'Incorrect email or password');
 
 	// Check password
 	const match = await bcrypt.compare(body.password, user.password);
-	appAssert(match, BAD_REQUEST, 'Incorrect email or password');
+	appAssert(match, UNAUTHORIZED, 'Incorrect email or password');
 
 	const { ip, userAgent } = getUserRequestInfo(req);
 

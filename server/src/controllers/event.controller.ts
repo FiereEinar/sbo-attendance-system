@@ -4,6 +4,7 @@ import EventModel from '../models/mongodb/event.model';
 import CustomResponse from '../models/utils/response';
 import appAssert from '../errors/app-assert';
 import { BAD_REQUEST, NO_CONTENT, NOT_FOUND } from '../constants/http';
+import AttendanceModel from '../models/mongodb/attendance.model';
 
 /**
  * @route GET /api/v1/event
@@ -60,4 +61,37 @@ export const deleteEventHandler = asyncHandler(async (req, res) => {
 	appAssert(event, NO_CONTENT, 'Event not found');
 
 	res.json(new CustomResponse(true, event, 'Event deleted successfully'));
+});
+
+/**
+ * @route GET /api/v1/event/:eventID/summary
+ */
+export const getEventAttendanceSummary = asyncHandler(async (req, res) => {
+	const { eventID } = req.params;
+	const event = await EventModel.findById(eventID);
+	appAssert(event, NOT_FOUND, 'Event not found');
+
+	const totalCheckedIn = await AttendanceModel.countDocuments({
+		event: eventID,
+		timeIn: { $ne: null },
+	});
+
+	const totalCheckedOut = await AttendanceModel.countDocuments({
+		event: eventID,
+		timeOut: { $ne: null },
+	});
+
+	let rate = 0;
+
+	if (totalCheckedIn > 0) {
+		rate = (totalCheckedOut / totalCheckedIn) * 100;
+	}
+
+	res.json(
+		new CustomResponse(
+			true,
+			{ totalCheckedIn, totalCheckedOut, rate },
+			'Event summary fetched successfully'
+		)
+	);
 });
