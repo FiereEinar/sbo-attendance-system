@@ -5,7 +5,7 @@ import StudentModel from '../models/mongodb/student.model';
 import appAssert from '../errors/app-assert';
 import { BAD_REQUEST, NOT_FOUND } from '../constants/http';
 import EventModel from '../models/mongodb/event.model';
-import { format, isWithinInterval } from 'date-fns';
+import { differenceInMinutes, format } from 'date-fns';
 
 /**
  * @route GET /api/v1/attendance - get recently recorded attendances
@@ -33,7 +33,7 @@ export const getEventAttendanceHandler = asyncHandler(async (req, res) => {
 		.limit(parseInt(limit?.toString() ?? '10'))
 		.populate('student')
 		.populate('event')
-		.sort({ createdAt: -1 })
+		.sort({ updatedAt: -1 })
 		.exec();
 
 	res.json(
@@ -163,13 +163,27 @@ export const downloadEventAttendanceCSVHandler = asyncHandler(
 			...attendances.map((attendance, i) => {
 				const fullname = `${attendance.student.firstname} ${attendance.student.middlename} ${attendance.student.lastname}`;
 				const eventDate = format(new Date(event.startTime), 'MM/dd/yyyy');
-				const timeIn = format(new Date(attendance.timeIn), 'hh:mm aaa');
-				const timeOut = format(new Date(attendance.timeOut), 'hh:mm aaa');
-				const isWithin = isWithinInterval(new Date(event.startTime), {
-					start: new Date(attendance.timeIn),
-					end: new Date(attendance.timeOut),
-				});
-				const remarks = isWithin ? 'Present' : 'Absent';
+				const timeIn = attendance.timeIn
+					? format(new Date(attendance.timeIn), 'hh:mm aaa')
+					: '--';
+				const timeOut = attendance.timeOut
+					? format(new Date(attendance.timeOut), 'hh:mm aaa')
+					: '--';
+
+				let remarks = 'Absent';
+
+				if (attendance.timeIn && attendance.timeOut) {
+					const start = new Date(event.startTime);
+					const timeIn = new Date(attendance.timeIn);
+
+					const minutesLate = differenceInMinutes(timeIn, start);
+
+					if (minutesLate <= 30) {
+						remarks = 'Present';
+					} else {
+						remarks = 'Late';
+					}
+				}
 
 				return `${i},${attendance.studentID},${fullname},${attendance.student.course}/${attendance.student.year},${event.title},${eventDate},${timeIn},${timeOut},${remarks}`;
 			}),

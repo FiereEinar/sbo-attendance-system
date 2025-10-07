@@ -1,11 +1,18 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/ui/header';
 import { useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS } from '../constants';
 import { fetchSingleEvent } from '../api/event';
 import { Check, ChevronLeft, X } from 'lucide-react';
 import type { Event } from '../types/event';
-import { format, isPast, isSameDay, isToday, isWithinInterval } from 'date-fns';
+import {
+	format,
+	isFuture,
+	isPast,
+	isSameDay,
+	isToday,
+	isWithinInterval,
+} from 'date-fns';
 import { Button, Input, Select } from '@mantine/core';
 import LiveClock from '../components/LiveClock';
 import { useRef, useState } from 'react';
@@ -71,7 +78,6 @@ export default function SingleEvent() {
 				);
 			}
 
-			console.log(data);
 			notification({
 				title: 'Attendance Recorded Successfully',
 				icon: <Check />,
@@ -79,6 +85,9 @@ export default function SingleEvent() {
 			});
 			await queryClient.invalidateQueries({
 				queryKey: [QUERY_KEYS.ATTENDANCES, eventID],
+			});
+			await queryClient.invalidateQueries({
+				queryKey: [QUERY_KEYS.EVENT_ATTENDANCE_SUMMARY, eventID],
 			});
 		} catch (error: any) {
 			console.error('Failed to record attendance', error.message);
@@ -139,7 +148,18 @@ export default function SingleEvent() {
 			{/* Right section */}
 			<aside className='bg-[#242424] p-5 w-[30%] rounded-xl space-y-5'>
 				<EventAttendanceSummary event={event} />
-				<Button variant='light'>Export Attendance</Button>
+
+				<div>
+					<Link
+						className='mt-5'
+						to={`${import.meta.env.VITE_API_URL}/attendance/event/${
+							event._id
+						}/download/csv`}
+						target='_blank'
+					>
+						<Button variant='light'>Export Attendance</Button>
+					</Link>
+				</div>
 
 				<Header size='sm'>
 					<LiveClock />
@@ -155,16 +175,19 @@ type TopSectionProps = {
 
 function TopSection({ event }: TopSectionProps) {
 	const navigate = useNavigate();
-	const eventStatus = isWithinInterval(new Date(), {
-		start: new Date(event.startTime),
-		end: new Date(event.endTime),
-	})
-		? '🟢Ongoing'
-		: isToday(new Date(event.startTime))
-		? '🕒Today'
-		: isPast(new Date(event.startTime))
-		? '🔴Ended'
-		: '🕒Upcoming';
+	let eventStatus = '🕒Upcoming';
+
+	const now = new Date();
+	const start = new Date(event.startTime);
+	const end = new Date(event.endTime);
+
+	if (isWithinInterval(now, { start, end })) {
+		eventStatus = '🟢Ongoing';
+	} else if (isToday(start) && isFuture(start)) {
+		eventStatus = '🕒Today';
+	} else if (isPast(end)) {
+		eventStatus = '🔴Ended';
+	}
 
 	return (
 		<div className='bg-[#242424] p-5 rounded-xl flex items-center justify-between'>
@@ -183,7 +206,7 @@ function TopSection({ event }: TopSectionProps) {
 					</div>
 					<div className='flex flex-col items-end'>
 						<p>{eventStatus}</p>
-						{isSameDay(new Date(event.startTime), new Date()) ? (
+						{isSameDay(new Date(event.startTime), new Date(event.endTime)) ? (
 							<p className='text-xs'>
 								{format(new Date(event.startTime), 'MMM dd, yyyy hh:mm aaa')} -{' '}
 								{format(new Date(event.endTime), 'hh:mm aaa')}

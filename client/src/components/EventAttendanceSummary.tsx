@@ -34,7 +34,7 @@ export default function EventAttendanceSummary({
 			<div>
 				<p>Total Checked In: {eventAttendanceSummary.totalCheckedIn}</p>
 				<p>Checked Out: {eventAttendanceSummary.totalCheckedOut}</p>
-				<p>Attendance Rate: {eventAttendanceSummary.rate}%</p>
+				<p>Attendance Rate: {Math.round(eventAttendanceSummary.rate)}%</p>
 			</div>
 		</>
 	);
