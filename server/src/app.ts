@@ -16,16 +16,19 @@ import studentRouter from './routes/student.route';
 import eventRouter from './routes/event.route';
 import attendanceRouter from './routes/attendance.route';
 import { auth } from './middlewares/auth';
+import { limiter } from './utils/rate-limiter';
+import helmet from 'helmet';
 
 const app = express();
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(helmet());
 app.get('/', healthcheck);
 
 // Routes
-app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/auth', limiter, authRouter);
 app.use(auth);
 app.use('/api/v1/student', studentRouter);
 app.use('/api/v1/event', eventRouter);

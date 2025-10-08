@@ -7,10 +7,6 @@ import {
 	getSingleEvent,
 	updateEventHandler,
 } from '../controllers/event.controller';
-import {
-	getEventAttendanceHandler,
-	getSingleAttendanceHandler,
-} from '../controllers/attendance.controller';
 const router = express.Router();
 
 router.get('/', getEventsHandler);
