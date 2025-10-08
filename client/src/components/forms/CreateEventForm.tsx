@@ -6,15 +6,20 @@ import InputField from '../InputField';
 import { DateTimePicker } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { Button } from '@mantine/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axiosInstance from '../../api/axiosInstance';
 import { useNotification } from '../../hooks/useNotification';
 import { queryClient } from '../../main';
 import { QUERY_KEYS } from '../../constants';
+import type { Event } from '../../types/event';
 
 type EventFormValues = z.infer<typeof createEventSchema>;
 
-export default function CreateEventForm() {
+type CreateEventFormProps = {
+	event?: Event;
+};
+
+export default function CreateEventForm({ event }: CreateEventFormProps) {
 	const notification = useNotification();
 	const [startTime, setStartTime] = useState(new Date().toISOString());
 	const [endTime, setEndTime] = useState('');
@@ -23,11 +28,23 @@ export default function CreateEventForm() {
 		handleSubmit,
 		register,
 		setError,
+		setValue,
 		reset,
 		formState: { errors, isSubmitting },
 	} = useForm({
 		resolver: zodResolver(createEventSchema),
 	});
+
+	useEffect(() => {
+		if (event) {
+			setValue('title', event.title);
+			setValue('description', event.description);
+			setValue('type', event.type);
+			setValue('venue', event.venue);
+			setStartTime(new Date(event.startTime).toISOString());
+			setEndTime(new Date(event.endTime).toISOString());
+		}
+	}, [event]);
 
 	const onSubmit = async (formData: EventFormValues) => {
 		try {
@@ -37,15 +54,18 @@ export default function CreateEventForm() {
 				endTime: new Date(endTime),
 			};
 
-			await axiosInstance.post('/event', body);
+			const { data } = event
+				? await axiosInstance.put(`/event/${event._id}`, body)
+				: await axiosInstance.post('/event', body);
 
 			notification({
-				title: 'Event created successfully!',
+				title: data.message,
 				message: '',
 			});
+
 			await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EVENTS] });
-			reset();
-			setEndTime('');
+			!event && reset();
+			!event && setEndTime('');
 		} catch (error: any) {
 			console.error('Failed to create event', error);
 			setError('root', error.message);

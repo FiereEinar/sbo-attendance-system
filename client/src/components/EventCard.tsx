@@ -8,6 +8,7 @@ import axiosInstance from '../api/axiosInstance';
 import { useNotification } from '../hooks/useNotification';
 import { QUERY_KEYS } from '../constants';
 import { Button } from '@mantine/core';
+import EditEventModal from '../modals/EditEventModal';
 
 type EventCardProps = {
 	event: Event;
@@ -66,9 +67,7 @@ export default function EventCard({ event }: EventCardProps) {
 			<div className='flex justify-between z-[100]'>
 				<p>{event.description}</p>
 				<div className='space-x-2'>
-					<Button variant='light' size='compact-xs' onClick={() => {}}>
-						edit
-					</Button>
+					<EditEventModal event={event} />
 					<Button
 						size='compact-xs'
 						color='red'
