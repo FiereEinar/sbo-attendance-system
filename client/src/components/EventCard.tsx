@@ -43,7 +43,10 @@ export default function EventCard({ event }: EventCardProps) {
 		<article className='flex flex-col gap-2'>
 			<div className='flex justify-between items-start'>
 				<div>
-					<Link to={`/admin/events/${event._id}`}>
+					<Link
+						className='transition-colors hover:text-blue-500'
+						to={`/admin/events/${event._id}`}
+					>
 						<Header size='sm'>{event.title}</Header>
 					</Link>
 					<p className='text-sm'>

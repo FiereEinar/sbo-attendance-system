@@ -5,8 +5,10 @@ import type { APIResponse } from '../../types/api-response';
 import { queryClient } from '../../main';
 import { QUERY_KEYS } from '../../constants';
 import { FileInput } from '@mantine/core';
+import { useNotification } from '../../hooks/useNotification';
 
 export default function ImportStudentsButton() {
+	const notification = useNotification();
 	const icon = <IconFileCv size={18} stroke={1.5} />;
 	const [loading, setIsLoading] = useState(false);
 
@@ -22,9 +24,18 @@ export default function ImportStudentsButton() {
 				formData
 			);
 
+			notification({
+				title: 'Students imported successfully',
+				message: '',
+			});
 			await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STUDENTS] });
 		} catch (err: any) {
 			console.error('Failed to import file', err);
+
+			notification({
+				title: 'Failed to import file',
+				message: err.message,
+			});
 		} finally {
 			setIsLoading(false);
 		}
@@ -35,6 +46,7 @@ export default function ImportStudentsButton() {
 			<FileInput
 				disabled={loading}
 				onChange={onSubmit}
+				accept='text/csv'
 				leftSection={icon}
 				label='Upload a CSV file of students'
 				placeholder='Your CV'

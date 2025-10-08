@@ -178,7 +178,7 @@ function TopSection({ event }: TopSectionProps) {
 						<div>
 							<Header>{event.title}</Header>
 							<p className='text-xs'>
-								{event.type} @ {event.venue}
+								{event.type} at the {event.venue}
 							</p>
 						</div>
 					</div>

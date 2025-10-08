@@ -120,7 +120,12 @@ export const serverlessCSVLoader = async (
 
 						// Save the student to the database if the `save` flag is true
 						if (save) {
-							await newStudent.save();
+							const existingStudent = await StudentModel.findOne({
+								studentID: row.studentID,
+							});
+							if (!existingStudent) {
+								await newStudent.save();
+							}
 						}
 					} catch (err) {
 						console.error(
