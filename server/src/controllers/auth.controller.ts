@@ -34,6 +34,7 @@ import {
 	AppErrorCodes,
 	refreshTokenCookieName,
 } from '../constants';
+import { verifyRecaptcha } from '../utils/recaptcha';
 
 /**
  * @route POST /api/v1/auth/login - Login
@@ -228,4 +229,16 @@ export const verifyAuthHandler = asyncHandler(async (req, res) => {
 	}
 
 	res.status(OK).json(user.omitPassword());
+});
+
+/**
+ * @route POST /api/v1/auth/recaptcha/verify
+ */
+export const recaptchaVerify = asyncHandler(async (req, res) => {
+	const { recaptchaToken } = req.body;
+
+	const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+	appAssert(isRecaptchaValid, BAD_REQUEST, 'Invalid recaptcha token');
+
+	res.status(OK).json(new CustomResponse(true, null, 'Recaptcha verified'));
 });
