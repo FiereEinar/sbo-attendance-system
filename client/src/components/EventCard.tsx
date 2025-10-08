@@ -66,12 +66,13 @@ export default function EventCard({ event }: EventCardProps) {
 			<div className='flex justify-between z-[100]'>
 				<p>{event.description}</p>
 				<div className='space-x-2'>
-					<Button size='compact-xs' onClick={() => {}}>
+					<Button variant='light' size='compact-xs' onClick={() => {}}>
 						edit
 					</Button>
 					<Button
 						size='compact-xs'
 						color='red'
+						variant='light'
 						onClick={() => onDelete(event._id)}
 					>
 						Delete
