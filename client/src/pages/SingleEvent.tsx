@@ -5,14 +5,7 @@ import { QUERY_KEYS } from '../constants';
 import { fetchSingleEvent } from '../api/event';
 import { Check, ChevronLeft, X } from 'lucide-react';
 import type { Event } from '../types/event';
-import {
-	format,
-	isFuture,
-	isPast,
-	isSameDay,
-	isToday,
-	isWithinInterval,
-} from 'date-fns';
+import { format, isSameDay } from 'date-fns';
 import { Button, Input, Select } from '@mantine/core';
 import LiveClock from '../components/LiveClock';
 import { useRef, useState } from 'react';
@@ -22,6 +15,7 @@ import { fetchRecentlyRecordedAttendances } from '../api/attendance';
 import { queryClient } from '../main';
 import AttendanceTable from '../components/AttendanceTable';
 import EventAttendanceSummary from '../components/EventAttendanceSummary';
+import { getEventStatus } from '../lib/utils';
 
 type TimeType = 'Time In' | 'Time Out';
 
@@ -57,24 +51,17 @@ export default function SingleEvent() {
 
 		try {
 			// setIsSubmittingAtt(true);
-
-			let data = null;
-
 			if (timeType === 'Time In') {
-				data = await axiosInstance.post(
+				await axiosInstance.post(
 					`/attendance/record/time-in/event/${eventID}`,
-					{
-						studentID,
-					}
+					{ studentID }
 				);
 			}
 
 			if (timeType === 'Time Out') {
-				data = await axiosInstance.post(
+				await axiosInstance.post(
 					`/attendance/record/time-out/event/${eventID}`,
-					{
-						studentID,
-					}
+					{ studentID }
 				);
 			}
 
@@ -175,19 +162,10 @@ type TopSectionProps = {
 
 function TopSection({ event }: TopSectionProps) {
 	const navigate = useNavigate();
-	let eventStatus = '🕒Upcoming';
-
-	const now = new Date();
-	const start = new Date(event.startTime);
-	const end = new Date(event.endTime);
-
-	if (isWithinInterval(now, { start, end })) {
-		eventStatus = '🟢Ongoing';
-	} else if (isToday(start) && isFuture(start)) {
-		eventStatus = '🕒Today';
-	} else if (isPast(end)) {
-		eventStatus = '🔴Ended';
-	}
+	const eventStatus = getEventStatus(
+		new Date(event.startTime),
+		new Date(event.endTime)
+	);
 
 	return (
 		<div className='bg-[#242424] p-5 rounded-xl flex items-center justify-between'>

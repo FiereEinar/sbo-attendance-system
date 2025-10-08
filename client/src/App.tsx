@@ -11,7 +11,7 @@ function App() {
 		<main className='flex items-start min-h-screen '>
 			<Sidebar />
 
-			<section className='bg-[#0A0A0A] p-5 w-full min-h-screen'>
+			<section className='bg-[#0A0A0A] p-5 w-full h-screen overflow-y-scroll'>
 				<Outlet />
 			</section>
 		</main>
