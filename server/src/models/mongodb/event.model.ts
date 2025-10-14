@@ -10,6 +10,7 @@ export interface IEvent extends mongoose.Document {
 	startTime: Date;
 	endTime: Date;
 	createdBy: mongoose.Types.ObjectId;
+	archived: boolean;
 }
 
 export const EventSchema = new Schema<IEvent>({
@@ -20,6 +21,10 @@ export const EventSchema = new Schema<IEvent>({
 	startTime: { type: Date, required: true },
 	endTime: { type: Date, required: true },
 	createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+	archived: {
+		type: Boolean,
+		default: false,
+	},
 });
 
 const EventModel = mongoose.model<IEvent>('Event', EventSchema);

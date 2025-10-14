@@ -10,7 +10,7 @@ import AttendanceModel from '../models/mongodb/attendance.model';
  * @route GET /api/v1/event
  */
 export const getEventsHandler = asyncHandler(async (req, res) => {
-	const events = await EventModel.find();
+	const events = await EventModel.find({ archived: false });
 	res.json(new CustomResponse(true, events, 'Events fetched successfully'));
 });
 
@@ -56,11 +56,49 @@ export const updateEventHandler = asyncHandler(async (req, res) => {
  */
 export const deleteEventHandler = asyncHandler(async (req, res) => {
 	const eventID = req.params.eventID;
-	const event = await EventModel.findByIdAndDelete(eventID);
 
+	const event = await EventModel.findByIdAndDelete(eventID);
 	appAssert(event, NO_CONTENT, 'Event not found');
 
+	const attendaces = await AttendanceModel.find({ event: eventID });
+	appAssert(!attendaces, BAD_REQUEST, 'Event has attendances');
+
 	res.json(new CustomResponse(true, event, 'Event deleted successfully'));
+});
+
+/**
+ * @route PATCH /api/v1/event/:eventID/archive
+ */
+export const archiveEventHandler = asyncHandler(async (req, res) => {
+	const eventID = req.params.eventID;
+
+	// Find and mark as archived
+	const event = await EventModel.findByIdAndUpdate(
+		eventID,
+		{ archived: true },
+		{ new: true }
+	);
+
+	appAssert(event, 404, 'Event not found');
+
+	res.json(new CustomResponse(true, event, 'Event archived successfully'));
+});
+
+/**
+ * @route PATCH /api/v1/event/:eventID/unarchive
+ */
+export const unarchiveEventHandler = asyncHandler(async (req, res) => {
+	const eventID = req.params.eventID;
+
+	const event = await EventModel.findByIdAndUpdate(
+		eventID,
+		{ archived: false },
+		{ new: true }
+	);
+
+	appAssert(event, 404, 'Event not found');
+
+	res.json(new CustomResponse(true, event, 'Event unarchived successfully'));
 });
 
 /**

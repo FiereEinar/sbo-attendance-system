@@ -23,17 +23,17 @@ export default function EventCard({ event }: EventCardProps) {
 
 	const onDelete = async (eventID: string) => {
 		try {
-			const { data } = await axiosInstance.delete(`/event/${eventID}`);
+			const { data } = await axiosInstance.patch(`/event/${eventID}/archive`);
 
 			notification({
-				title: 'Event deleted',
+				title: 'Event archived',
 				message: data.message ?? '',
 			});
 			await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.EVENTS] });
 		} catch (error: any) {
-			console.error('Failed to delete event', error);
+			console.error('Failed to archive event', error);
 			notification({
-				title: 'Failed to delete event',
+				title: 'Failed to archive event',
 				message: error.message ?? '',
 			});
 		}
