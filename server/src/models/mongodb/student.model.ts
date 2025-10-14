@@ -19,13 +19,13 @@ export interface IStudent extends mongoose.Document {
 export const StudentSchema = new Schema<IStudent>(
 	{
 		studentID: { type: String, required: true },
-		firstname: { type: String, required: true },
-		lastname: { type: String, required: true },
+		firstname: { type: String, required: false },
+		lastname: { type: String, required: false },
 		middlename: { type: String, required: false },
-		gender: { type: String, enum: ['M', 'F'], default: 'M', required: true },
+		gender: { type: String, enum: ['M', 'F'], default: 'M', required: false },
 		email: { type: String, required: false },
 		year: { type: Number, required: true },
-		course: { type: String, required: true },
+		course: { type: String, required: false },
 	},
 	{ timestamps: true }
 );

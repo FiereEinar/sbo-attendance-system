@@ -61,9 +61,21 @@ export const recordTimeInAttendanceHandler = asyncHandler(async (req, res) => {
 	const { eventID } = req.params;
 	const { studentID } = req.body;
 
+	// old code
 	// Check if student exists
-	const student = await StudentModel.findOne({ studentID });
-	appAssert(student, NOT_FOUND, 'Student not found');
+	// const student = await StudentModel.findOne({ studentID });
+	// appAssert(student, NOT_FOUND, 'Student not found');
+
+	let student = await StudentModel.findOne({ studentID });
+	if (!student) {
+		student = await StudentModel.create({
+			studentID,
+			year: 1,
+			firstname: '',
+			lastname: '',
+			course: '',
+		});
+	}
 
 	// Check if event exists
 	const event = await EventModel.findById(eventID);
@@ -101,9 +113,21 @@ export const recordTimeOutAttendanceHandler = asyncHandler(async (req, res) => {
 	const { eventID } = req.params;
 	const { studentID } = req.body;
 
+	// old code
 	// Check if student exists
-	const student = await StudentModel.findOne({ studentID });
-	appAssert(student, NOT_FOUND, 'Student not found');
+	// const student = await StudentModel.findOne({ studentID });
+	// appAssert(student, NOT_FOUND, 'Student not found');
+
+	let student = await StudentModel.findOne({ studentID });
+	if (!student) {
+		student = await StudentModel.create({
+			studentID,
+			year: 1,
+			firstname: '',
+			lastname: '',
+			course: '',
+		});
+	}
 
 	// Check if event exists
 	const event = await EventModel.findById(eventID);
