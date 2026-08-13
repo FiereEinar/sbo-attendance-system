@@ -1,69 +1,59 @@
-# React + TypeScript + Vite
+# SEATS — Client (frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + TypeScript + Vite frontend for **SEATS**, the SBO Attendance System desktop app.
+This is the webview side of a Tauri v2 application; the Rust backend lives in [`../src-tauri`](../src-tauri).
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** + **react-router-dom 7**
+- **Vite 7** + TypeScript 5.8
+- **Mantine 8** + Tailwind CSS 3 (UI)
+- **@tanstack/react-query** (server state)
+- **zustand** (client state), **react-hook-form** + **zod** (forms/validation)
+- **framer-motion** (animation), **recharts** (charts)
+- **date-fns** / **dayjs** (dates)
 
-## Expanding the ESLint configuration
+## Getting started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Requires [Bun](https://bun.sh) and the Rust toolchain (see the [root README](../README.md) for full prerequisites). From the repository root:
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+bun run dev        # = cd client && bun run tauri dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+To run just the Vite development server (frontend only, without the Tauri window):
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+bun install
+bun run dev
 ```
+
+The browser preview is useful for inspecting the UI, but data features require the SEATS desktop app because the frontend communicates with Rust through Tauri IPC.
+
+## Scripts
+
+| Command                | Description                                          |
+| ---------------------- | ---------------------------------------------------- |
+| `bun run dev`          | Start the Vite development server                    |
+| `bun run build`        | Type-check and build the frontend                    |
+| `bun run typecheck`    | Run the TypeScript project check                     |
+| `bun run lint`         | Run ESLint                                           |
+| `bun run format:check` | Verify Prettier formatting                           |
+| `bun run preview`      | Preview the production build                         |
+| `bun run tauri`        | Run a Tauri CLI command, such as `bun run tauri dev` |
+
+## Project layout
+
+```text
+src/
+├── api/          # Typed frontend wrappers around Tauri IPC commands
+├── components/   # Shared UI, charts, reports, forms, buttons, and modals
+├── constants/    # Query keys and navigation definitions
+├── hooks/        # Shared React hooks
+├── lib/          # Tauri IPC bridge, routing, validation, and utilities
+├── pages/        # Route-level pages (Dashboard/, Settings/, SingleEvent/, …)
+├── store/        # Zustand stores (theme, student filters)
+└── types/        # Shared TypeScript types (attendance, events, students, …)
+```
+
+The frontend invokes Rust commands through [`src/lib/ipc.ts`](src/lib/ipc.ts). Native operations such as database backup/restore, student import, kiosk mode, and Excel exports are implemented in [`../src-tauri/src/commands`](../src-tauri/src/commands).

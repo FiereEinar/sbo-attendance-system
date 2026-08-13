@@ -1,198 +1,144 @@
-import _ from 'lodash';
-import { Table, Select, Loader, Text } from '@mantine/core';
-import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import type { Student } from '../types/student';
-import {
-	useStudentFilterStore,
-	type StudentFilterValues,
-} from '../store/studentsFilter';
-import { QUERY_KEYS } from '../constants';
-import { fetchAvailableCourses, fetchStudents } from '../api/student';
-import { queryClient } from '../main';
+import { cn } from '../lib/utils';
 
 interface StudentsTableProps {
 	students: Student[] | undefined;
 	isLoading: boolean;
 }
 
-export default function StudentsTable({
-	students,
-	isLoading,
-}: StudentsTableProps) {
-	// const navigate = useNavigate();
+/** Deterministic pastel for the avatar, derived from the student's name. */
+const AVATAR_COLORS = [
+	'bg-blue-400/15 text-blue-300',
+	'bg-emerald-400/15 text-emerald-300',
+	'bg-violet-400/15 text-violet-300',
+	'bg-amber-400/15 text-amber-300',
+	'bg-rose-400/15 text-rose-300',
+	'bg-sky-400/15 text-sky-300',
+	'bg-pink-400/15 text-pink-300',
+];
 
-	return (
-		<Table highlightOnHover>
-			<Table.Thead>
-				<Table.Tr>
-					<Table.Th style={{ width: 100 }}>Student ID</Table.Th>
-					<Table.Th style={{ width: 250 }}>Full name</Table.Th>
-					<Table.Th style={{ width: 150 }}>
-						<TableHeadCoursePicker />
-					</Table.Th>
-					<Table.Th style={{ width: 100 }}>
-						<TableHeadYearPicker />
-					</Table.Th>
-					<Table.Th style={{ width: 100 }}>
-						<TableHeadGenderPicker />
-					</Table.Th>
-				</Table.Tr>
-			</Table.Thead>
-
-			<Table.Tbody>
-				{isLoading && (
-					<Table.Tr>
-						<Table.Td colSpan={7}>
-							<div style={{ textAlign: 'center', padding: '1rem' }}>
-								<Loader size='sm' />
-							</div>
-						</Table.Td>
-					</Table.Tr>
-				)}
-
-				{!students?.length && !isLoading && (
-					<Table.Tr>
-						<Table.Td colSpan={7}>
-							<Text ta='center'>No students</Text>
-						</Table.Td>
-					</Table.Tr>
-				)}
-
-				{students?.map((student) => (
-					<Table.Tr
-						className='transition-all'
-						key={student._id}
-						// style={{ cursor: 'pointer' }}
-						// onClick={() => navigate(`/student/${student.studentID}`)}
-					>
-						<Table.Td>{student.studentID}</Table.Td>
-						<Table.Td>
-							{_.startCase(
-								`${student.firstname} ${student.middlename ?? ''} ${
-									student.lastname
-								}`.toLowerCase()
-							)}
-						</Table.Td>
-						<Table.Td>{student.course}</Table.Td>
-						<Table.Td>{student.year}</Table.Td>
-						<Table.Td>{student.gender}</Table.Td>
-					</Table.Tr>
-				))}
-			</Table.Tbody>
-
-			{/* <Table.Tfoot>
-				<Table.Tr>
-					<Table.Td colSpan={6}>Total</Table.Td>
-					<Table.Td style={{ textAlign: 'right' }}>{totalAmount}</Table.Td>
-				</Table.Tr>
-			</Table.Tfoot> */}
-		</Table>
-	);
+function avatarColor(name: string): string {
+	let hash = 0;
+	for (let i = 0; i < name.length; i++) {
+		hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+	}
+	return AVATAR_COLORS[hash % AVATAR_COLORS.length];
 }
 
-function TableHeadCoursePicker() {
-	const { course, page, pageSize, setCourse, getFilterValues } =
-		useStudentFilterStore((state) => state);
-	const { data: courses } = useQuery({
-		queryKey: [QUERY_KEYS.STUDENT_COURSES],
-		queryFn: fetchAvailableCourses,
-	});
-
-	const prefetch = (course: string) => {
-		if (course !== 'All') {
-			const filters = { ...getFilterValues(), course };
-			const data = queryClient.getQueryData([QUERY_KEYS.STUDENTS, filters]);
-
-			if (data) return;
-
-			queryClient.prefetchQuery({
-				queryKey: [QUERY_KEYS.STUDENTS, filters],
-				queryFn: () => fetchStudents(filters, page, pageSize),
-			});
-		}
-	};
-
-	return (
-		<Select
-			placeholder='Course'
-			value={course}
-			onChange={(value) => value && setCourse(value)}
-			data={courses ? ['All', ...courses] : ['All']}
-			onDropdownOpen={() => courses?.forEach(prefetch)}
-			// styles={{ input: { border: 'none' } }}
-		/>
-	);
+function initialsOf(student: Student): string {
+	return `${student.firstname[0] ?? ''}${student.lastname[0] ?? ''}`.toUpperCase();
 }
 
-function TableHeadYearPicker() {
-	const { page, pageSize, year, setYear, getFilterValues } =
-		useStudentFilterStore((state) => state);
-	const yearsOptions = ['All', '1', '2', '3', '4'];
-
-	const prefetch = (selectedYear: StudentFilterValues['year']) => {
-		if (selectedYear !== 'All') {
-			const filters = { ...getFilterValues(), year: selectedYear };
-			const data = queryClient.getQueryData([QUERY_KEYS.STUDENTS, filters]);
-
-			if (data) return;
-
-			queryClient.prefetchQuery({
-				queryKey: [QUERY_KEYS.STUDENTS, filters],
-				queryFn: () => fetchStudents(filters, page, pageSize),
-			});
-		}
-	};
-
+export default function StudentsTable({ students, isLoading }: StudentsTableProps) {
 	return (
-		<Select
-			placeholder='Year'
-			value={year}
-			onChange={(value) =>
-				value && setYear(value as StudentFilterValues['year'])
-			}
-			data={yearsOptions}
-			onDropdownOpen={() =>
-				yearsOptions.forEach((year) =>
-					prefetch(year as StudentFilterValues['year'])
-				)
-			}
-			// styles={{ input: { border: 'none' } }}
-		/>
-	);
-}
+		<div className="glass w-full min-w-0 overflow-hidden rounded-2xl">
+			<table className="w-full table-fixed text-sm">
+				<thead>
+					<tr className="border-b border-white/[0.06]">
+						{['Student ID', 'Full name', 'Course', 'Year', 'Gender'].map((head) => (
+							<th
+								key={head}
+								className={cn(
+									'break-words px-2 py-3 text-left text-[10px] font-medium uppercase tracking-micro text-white/30 first:pl-3 last:pr-3 sm:px-4 sm:py-3.5 sm:text-[11px] sm:first:pl-6 sm:last:pr-6',
+									head === 'Student ID' && 'w-[34%] sm:w-[20%]',
+									head === 'Full name' && 'w-[66%] sm:w-[35%]',
+									head === 'Course' && 'hidden sm:table-cell sm:w-[20%]',
+									head === 'Year' && 'hidden sm:table-cell sm:w-[10%]',
+									head === 'Gender' && 'hidden sm:table-cell sm:w-[15%]'
+								)}
+							>
+								{head}
+							</th>
+						))}
+					</tr>
+				</thead>
+				<tbody>
+					{isLoading &&
+						[0, 1, 2, 3, 4].map((i) => (
+							<tr key={i} className="border-b border-white/[0.03] animate-pulse">
+								<td className="px-2 py-3 first:pl-3 sm:px-4 sm:py-3.5 sm:first:pl-6">
+									<div className="h-3 w-24 rounded-full bg-white/[0.05]" />
+								</td>
+								<td className="px-2 py-3 sm:px-4 sm:py-3.5">
+									<div className="flex min-w-0 items-center gap-3">
+										<div className="w-8 h-8 rounded-full bg-white/[0.05]" />
+										<div className="h-3 w-36 rounded-full bg-white/[0.05]" />
+									</div>
+								</td>
+								<td className="hidden px-2 py-3 sm:table-cell sm:px-4 sm:py-3.5">
+									<div className="h-3 w-full max-w-16 rounded-full bg-white/[0.05]" />
+								</td>
+								<td className="hidden px-2 py-3 sm:table-cell sm:px-4 sm:py-3.5">
+									<div className="h-3 w-full max-w-8 rounded-full bg-white/[0.05]" />
+								</td>
+								<td className="hidden px-2 py-3 last:pr-3 sm:table-cell sm:px-4 sm:py-3.5 sm:last:pr-6">
+									<div className="h-3 w-full max-w-12 rounded-full bg-white/[0.05]" />
+								</td>
+							</tr>
+						))}
 
-function TableHeadGenderPicker() {
-	const { page, pageSize, gender, setGender, getFilterValues } =
-		useStudentFilterStore((state) => state);
-	const gendersOptions = ['All', 'M', 'F'];
-
-	const prefetch = async (selectedGender: StudentFilterValues['gender']) => {
-		if (selectedGender !== 'All') {
-			const filters = { ...getFilterValues(), gender: selectedGender };
-			const data = queryClient.getQueryData([QUERY_KEYS.STUDENTS, filters]);
-			if (data) return;
-
-			await queryClient.prefetchQuery({
-				queryKey: [QUERY_KEYS.STUDENTS, filters],
-				queryFn: () => fetchStudents(filters, page, pageSize),
-			});
-		}
-	};
-
-	return (
-		<Select
-			placeholder='Gender'
-			value={gender}
-			onChange={(value) =>
-				value && setGender(value as StudentFilterValues['gender'])
-			}
-			data={gendersOptions}
-			onDropdownOpen={() =>
-				gendersOptions.forEach((gender) =>
-					prefetch(gender as StudentFilterValues['gender'])
-				)
-			}
-			// styles={{ input: { border: 'none' } }}
-		/>
+					{!isLoading &&
+						students?.map((student, i) => {
+							const name = `${student.firstname} ${
+								student.middlename ? student.middlename + ' ' : ''
+							}${student.lastname}`.trim();
+							return (
+								<motion.tr
+									key={student._id}
+									className="border-b border-white/[0.03] transition-colors hover:bg-white/[0.02]"
+									initial={{ opacity: 0, y: 8 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{
+										type: 'spring',
+										bounce: 0,
+										duration: 0.35,
+										delay: i * 0.03,
+									}}
+								>
+									<td className="break-all px-2 py-3 text-xs font-mono tabular-nums text-white/60 first:pl-3 sm:px-4 sm:py-3.5 sm:first:pl-6">
+										{student.studentID}
+									</td>
+									<td className="min-w-0 break-words px-2 py-3 sm:px-4 sm:py-3.5">
+										<div className="flex min-w-0 items-center gap-3">
+											<div
+												className={cn(
+													'w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-xs font-semibold',
+													avatarColor(name)
+												)}
+											>
+												{initialsOf(student)}
+											</div>
+											<span className="min-w-0 break-words font-medium text-white/85">
+												{name}
+												<span className="mt-0.5 block break-words text-[11px] font-normal text-white/35 sm:hidden">
+													{student.course} · Year {student.year} ·{' '}
+													{student.gender === 'M' ? 'Male' : 'Female'}
+												</span>
+											</span>
+										</div>
+									</td>
+									<td className="hidden break-words px-2 py-3 text-white/50 sm:table-cell sm:px-4 sm:py-3.5">
+										{student.course}
+									</td>
+									<td className="hidden px-2 py-3 tabular-nums text-white/50 sm:table-cell sm:px-4 sm:py-3.5">
+										{student.year}
+									</td>
+									<td className="hidden px-2 py-3 last:pr-3 sm:table-cell sm:px-4 sm:py-3.5 sm:last:pr-6">
+										<span
+											className={cn(
+												'inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium border border-white/[0.08] bg-white/[0.04]',
+												student.gender === 'M' ? 'text-sky-300' : 'text-pink-300'
+											)}
+										>
+											{student.gender === 'M' ? 'Male' : 'Female'}
+										</span>
+									</td>
+								</motion.tr>
+							);
+						})}
+				</tbody>
+			</table>
+		</div>
 	);
 }

@@ -1,45 +1,54 @@
-import { FileInput } from '@mantine/core';
-import { IconFileCv } from '@tabler/icons-react';
-import { queryClient } from '../main';
 import { useState } from 'react';
-import axiosInstance from '../api/axiosInstance';
+import { queryClient } from '../main';
 import { QUERY_KEYS } from '../constants';
-import type { APIResponse } from '../types/api-response';
+import { importStudentsFile } from '../lib/tauri';
+import { useNotification } from '../hooks/useNotification';
+import { UploadSimple, ArrowCounterClockwise } from '@phosphor-icons/react';
 
 export default function UploadStudents() {
-	const icon = <IconFileCv size={18} stroke={1.5} />;
+	const notification = useNotification();
 	const [loading, setIsLoading] = useState(false);
 
-	const onSubmit = async (file: File | null) => {
+	const handleImport = async () => {
 		try {
 			setIsLoading(true);
 
-			const formData = new FormData();
-			if (file) formData.append('students_file_csv', file);
+			const count = await importStudentsFile();
 
-			await axiosInstance.post<APIResponse<null>>(
-				'/student/file/import',
-				formData
-			);
+			notification({
+				title: 'Students imported successfully',
+				message: `${count} record${count === 1 ? '' : 's'} imported`,
+			});
+			await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STUDENTS] });
+			await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STUDENT_COURSES] });
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : 'Unknown error';
+			if (msg === 'No file selected') return;
 
-			queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.STUDENTS] });
-		} catch (err: any) {
-			console.error('Failed to import file', err);
+			notification({
+				title: 'Failed to import file',
+				message: msg,
+			});
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
 	return (
-		<div>
-			<FileInput
+		<div className="p-8 max-w-md">
+			<button
+				type="button"
+				onClick={handleImport}
 				disabled={loading}
-				onChange={onSubmit}
-				leftSection={icon}
-				label='Upload a CSV file of students'
-				placeholder='Your CV'
-				leftSectionPointerEvents='none'
-			/>
+				className="inline-flex items-center gap-2 rounded-full bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.1] text-white/80 text-sm font-medium px-4 py-2 transition-[background-color,transform] duration-150 ease-apple-out active:scale-[0.97] disabled:opacity-50 disabled:cursor-not-allowed"
+			>
+				{loading ? (
+					<ArrowCounterClockwise className="w-4 h-4 motion-safe:animate-spin" />
+				) : (
+					<UploadSimple className="w-4 h-4" />
+				)}
+				{loading ? 'Importing…' : 'Import Students'}
+			</button>
 		</div>
 	);
 }
